@@ -183,23 +183,16 @@ export default function AddEventModal({
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Category</label>
             <div className="relative">
-              {category && (
-                <div className={`absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full ${
-                  category === 'Exam' ? 'bg-red-500' : 
-                  category === 'Assignment' ? 'bg-blue-500' : 
-                  category === 'Meeting' ? 'bg-purple-500' : 'bg-gray-400'
-                }`} />
-              )}
               <select 
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className={`w-full ${category ? 'pl-9' : 'pl-4'} pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300 transition-all font-medium text-gray-900 appearance-none`}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-300 transition-all font-medium text-gray-900"
               >
                 <option value="" disabled>Select a category...</option>
-                <option value="Exam">Exam</option>
-                <option value="Assignment">Assignment</option>
-                <option value="Meeting">Meeting</option>
-                <option value="General">General</option>
+                <option value="Exam">🔴 Exam</option>
+                <option value="Assignment">🔵 Assignment</option>
+                <option value="Meeting">🟣 Meeting</option>
+                <option value="General">⚪ General</option>
               </select>
             </div>
           </div>

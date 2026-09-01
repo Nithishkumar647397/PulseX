@@ -21,6 +21,7 @@ import {
   CircleDot,
   X
 } from 'lucide-react'
+import AddEventModal from '@/components/AddEventModal'
 
 // --- Types ---
 type Event = {
@@ -95,11 +96,6 @@ export default function DashboardPage() {
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [newEventTitle, setNewEventTitle] = useState('')
-  const [newEventDate, setNewEventDate] = useState('')
-  const [newEventCategory, setNewEventCategory] = useState('general')
-  const [newEventPriority, setNewEventPriority] = useState<string>('')
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // --- Fetch Data ---
   const fetchData = async () => {
@@ -163,42 +159,6 @@ export default function DashboardPage() {
     } catch (error) {
       // Revert on error
       setTodayEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: !updatedStatus } : e))
-    }
-  }
-
-  const handleCreateEvent = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newEventTitle || !newEventDate || !newEventCategory) return
-
-    setIsSubmitting(true)
-    try {
-      const payload: any = {
-        title: newEventTitle,
-        event_date: new Date(newEventDate).toISOString(),
-        category: newEventCategory
-      }
-      if (newEventPriority) {
-        payload.priority = parseInt(newEventPriority, 10)
-      }
-
-      await fetch('/api/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      setIsModalOpen(false)
-      setNewEventTitle('')
-      setNewEventDate('')
-      setNewEventCategory('general')
-      setNewEventPriority('')
-      
-      // Refresh all data
-      fetchData()
-    } catch (error) {
-      console.error('Failed to create event', error)
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -449,79 +409,13 @@ export default function DashboardPage() {
 
       {/* Add Event Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center sm:p-4 animate-in fade-in duration-200">
-          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 pb-safe shadow-2xl animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">Add New Event</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 -mr-2 text-gray-400 hover:text-gray-600 bg-gray-50 rounded-full">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleCreateEvent} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <input 
-                  type="text" 
-                  value={newEventTitle}
-                  onChange={(e) => setNewEventTitle(e.target.value)}
-                  placeholder="e.g., Final Physics Exam"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none transition-all placeholder:text-gray-400"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date & Time</label>
-                <input 
-                  type="datetime-local" 
-                  value={newEventDate}
-                  onChange={(e) => setNewEventDate(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none transition-all"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                  <select 
-                    value={newEventCategory}
-                    onChange={(e) => setNewEventCategory(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none transition-all bg-white"
-                  >
-                    <option value="general">General</option>
-                    <option value="exam">Exam</option>
-                    <option value="assignment">Assignment</option>
-                    <option value="meeting">Meeting</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority (Optional)</label>
-                  <select 
-                    value={newEventPriority}
-                    onChange={(e) => setNewEventPriority(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none transition-all bg-white"
-                  >
-                    <option value="">Auto-detect</option>
-                    <option value="4">High (4)</option>
-                    <option value="3">Med-High (3)</option>
-                    <option value="2">Medium (2)</option>
-                    <option value="1">Low (1)</option>
-                  </select>
-                </div>
-              </div>
-
-              <button 
-                type="submit" 
-                disabled={isSubmitting || !newEventTitle || !newEventDate}
-                className="w-full bg-black text-white py-4 rounded-xl font-medium mt-4 hover:bg-gray-900 transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
-              >
-                {isSubmitting ? 'Saving...' : 'Save Event'}
-              </button>
-            </form>
-          </div>
-        </div>
+        <AddEventModal 
+          onClose={() => setIsModalOpen(false)} 
+          onSuccess={() => {
+            setIsModalOpen(false)
+            fetchData()
+          }} 
+        />
       )}
 
     </div>
