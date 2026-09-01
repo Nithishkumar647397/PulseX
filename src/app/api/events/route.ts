@@ -13,18 +13,27 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url)
   const days = parseInt(searchParams.get('days') || '7', 10)
+  const startDate = searchParams.get('startDate')
+  const endDate = searchParams.get('endDate')
 
-  // Get current date and target date in ISO string format
-  const today = new Date()
-  const targetDate = new Date(today)
-  targetDate.setDate(today.getDate() + days)
+  // Calculate dates
+  let start = new Date()
+  let end = new Date()
+  
+  if (startDate && endDate) {
+    start = new Date(startDate)
+    end = new Date(endDate)
+  } else {
+    // Legacy support for `days`
+    end.setDate(start.getDate() + days)
+  }
 
   const { data, error } = await supabase
     .from('events')
-    .select('*')
+    .select('*, sent_log(*)')
     .eq('user_id', user.id)
-    .gte('event_date', today.toISOString())
-    .lte('event_date', targetDate.toISOString())
+    .gte('event_date', start.toISOString())
+    .lte('event_date', end.toISOString())
     .order('event_date', { ascending: true })
 
   if (error) {
