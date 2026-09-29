@@ -10,28 +10,24 @@ export default function SignupPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const isFormValid = fullName.trim() && isValidEmail(email) && password.length >= 6
-
-  const calculateStrength = (p: string) => {
-    let score = 0
-    if (p.length > 5) score += 1
-    if (p.length > 8) score += 1
-    if (/[A-Z]/.test(p)) score += 1
-    if (/[0-9]/.test(p)) score += 1
-    if (/[^A-Za-z0-9]/.test(p)) score += 1
-    return score
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   }
-  const strength = calculateStrength(password)
+
+  const isFormValid = 
+    email.trim() !== '' && 
+    isValidEmail(email) && 
+    password.trim() !== '' && 
+    password === confirmPassword && 
+    password.length >= 6
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,13 +42,16 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          data: { full_name: fullName, timezone },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         }
       })
 
       if (signUpError) {
-        setError(signUpError.message || 'An error occurred during sign up.')
+        if (signUpError.message.toLowerCase().includes('fetch')) {
+          setError('Network error. Please try again.')
+        } else {
+          setError(signUpError.message || 'An error occurred during sign up.')
+        }
         return
       }
 
@@ -79,26 +78,60 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-[480px] card-pulse">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-8">
         
         {/* Header section */}
         <div className="flex flex-col items-center mb-8">
-          <div className="bg-accent-amber text-black p-3 rounded-xl mb-6 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+          <div className="bg-black text-white p-3 rounded-xl mb-6">
             <Activity className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-bold text-text-primary mb-2 tracking-tight">Create an account</h1>
-          <p className="text-text-muted text-center">Join PulseX to master your schedule.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create an account</h1>
+          <p className="text-gray-500 text-center">Join PulseX to master your schedule.</p>
+        </div>
+
+        {/* Marketing / Info Card */}
+        <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-8">
+          <p className="text-[10px] font-bold text-blue-800 tracking-wider mb-4">
+            REMINDERS THAT INCREASE WITH URGENCY.
+          </p>
+          
+          <div className="relative mb-6 mt-2">
+            {/* Background track */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-gray-200 rounded-full"></div>
+            {/* Gradient progress */}
+            <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-200 to-blue-600 rounded-full"></div>
+            
+            {/* Dots and Labels */}
+            <div className="relative flex justify-between items-center text-[10px] font-medium">
+              <div className="flex flex-col items-center gap-2 -ml-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300 z-10 border-2 border-white shadow-sm"></div>
+                <span className="text-gray-400 mt-1">7 DAYS</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300 z-10 border-2 border-white shadow-sm"></div>
+                <span className="text-gray-400 mt-1">3 DAYS</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300 z-10 border-2 border-white shadow-sm"></div>
+                <span className="text-gray-400 mt-1">1 DAY</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 -mr-3">
+                <div className="w-3.5 h-3.5 rounded-full bg-blue-600 z-10 border-2 border-white shadow-md ring-4 ring-blue-100"></div>
+                <span className="text-blue-600 font-bold mt-1">TODAY</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Messages */}
         {error && (
-          <div className="mb-6 p-3 bg-danger-red/10 border border-danger-red/30 text-danger-red text-sm rounded-xl text-center font-medium">
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
             {error}
           </div>
         )}
         {successMessage && (
-          <div className="mb-6 p-3 bg-success-green/10 border border-success-green/30 text-success-green text-sm rounded-xl text-center font-medium">
+          <div className="mb-6 p-3 bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg text-center">
             {successMessage}
           </div>
         )}
@@ -106,88 +139,72 @@ export default function SignupPage() {
         {/* Form */}
         <form onSubmit={handleSignUp} className="space-y-5">
           <div className="space-y-1">
-            <label className="text-sm font-medium text-text-primary">Full Name</label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="John Doe"
-              className="input-pulse"
-              disabled={loading}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-text-primary">Email</label>
+            <label className="text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="input-pulse"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all placeholder:text-gray-400"
               disabled={loading}
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-text-primary">Password</label>
+            <label className="text-sm font-medium text-gray-700">Password</label>
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Create a password (min 6 chars)"
-                className="input-pulse pr-12"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all placeholder:text-gray-400 pr-12"
                 disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-text-muted hover:text-text-primary focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 focus:outline-none"
                 disabled={loading}
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
-            {/* Strength Meter */}
-            {password.length > 0 && (
-              <div className="mt-2 flex gap-1 h-1.5">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <div key={i} className={`flex-1 rounded-full transition-all duration-300 ${strength >= i ? (strength > 3 ? 'bg-success-green' : strength > 2 ? 'bg-accent-amber' : 'bg-danger-red') : 'bg-border'}`}></div>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm font-medium text-text-primary">Timezone</label>
-            <select
-              value={timezone}
-              onChange={(e) => setTimezone(e.target.value)}
-              className="input-pulse"
-              disabled={loading}
-            >
-              <option value={timezone}>{timezone} (Detected)</option>
-              {/* Could add a full list of timezones here later */}
-            </select>
+            <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-black focus:border-black outline-none transition-all placeholder:text-gray-400 pr-12"
+                disabled={loading}
+              />
+            </div>
+            {password && confirmPassword && password !== confirmPassword && (
+              <p className="text-xs text-red-500 mt-1">Passwords do not match.</p>
+            )}
           </div>
 
           <button
             type="submit"
             disabled={!isFormValid || loading}
-            className="btn-primary w-full mt-6"
+            className="w-full flex items-center justify-center gap-2 bg-black hover:bg-gray-900 text-white py-3.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
           >
             {loading ? 'Creating account...' : 'Sign Up'}
-            {!loading && <ArrowRight className="w-5 h-5 ml-2" />}
+            {!loading && <ArrowRight className="w-4 h-4" />}
           </button>
         </form>
 
         <div className="relative my-8">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border"></div>
+            <div className="w-full border-t border-gray-200"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-surface text-text-muted">OR</span>
+            <span className="px-2 bg-white text-gray-500">OR</span>
           </div>
         </div>
 
@@ -195,9 +212,9 @@ export default function SignupPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="btn-ghost w-full"
+          className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
               fill="currentColor"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -218,9 +235,9 @@ export default function SignupPage() {
           Continue with Google
         </button>
 
-        <p className="mt-8 text-center text-sm text-text-muted">
+        <p className="mt-8 text-center text-sm text-gray-600">
           Already have an account?{' '}
-          <Link href="/login" className="text-accent-amber font-semibold hover:underline">
+          <Link href="/login" className="text-black font-semibold hover:underline">
             Sign in
           </Link>
         </p>

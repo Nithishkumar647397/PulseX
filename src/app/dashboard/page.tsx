@@ -19,8 +19,7 @@ import {
   FileText,
   Users,
   CircleDot,
-  Trash2,
-  Zap
+  X
 } from 'lucide-react'
 import AddEventModal from '@/components/AddEventModal'
 
@@ -71,16 +70,14 @@ const getCategoryIcon = (category: string) => {
   }
 }
 
-const getPriorityClass = (priority: number) => {
-  if (priority >= 4) return 'chip-exam'
-  if (priority === 3) return 'chip-high'
-  if (priority === 2) return 'chip-medium'
-  return 'chip-low'
+const getPriorityColor = (priority: number) => {
+  if (priority >= 3) return 'bg-red-100 text-red-700'
+  if (priority === 2) return 'bg-yellow-100 text-yellow-700'
+  return 'bg-gray-100 text-gray-700'
 }
 
 const getPriorityLabel = (priority: number) => {
-  if (priority >= 4) return 'EXAM'
-  if (priority === 3) return 'HIGH'
+  if (priority >= 3) return 'HIGH'
   if (priority === 2) return 'MEDIUM'
   return 'LOW'
 }
@@ -104,15 +101,18 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      
       if (!user) {
         router.push('/login')
         return
       }
+      
+      // Attempt to get name from raw_user_meta_data or profiles
       setUserName(user?.user_metadata?.full_name?.split(' ')[0] || 'Demo User')
 
       const [resToday, resUpcoming, resConflicts, resStreak] = await Promise.all([
         fetch('/api/events/today'),
-        fetch('/api/events?days=7'), 
+        fetch('/api/events?days=14'), // get next 14 days
         fetch('/api/conflicts'),
         fetch('/api/streak')
       ])
@@ -126,6 +126,7 @@ export default function DashboardPage() {
       setConflicts(conflictsData.conflicts || [])
       setStreak(streakData)
 
+      // Filter upcoming to exclude today's events if they appear
       const todayIds = new Set((todayData.events || []).map((e: Event) => e.id))
       setUpcomingEvents((upcomingData.events || []).filter((e: Event) => !todayIds.has(e.id)))
 
@@ -142,6 +143,7 @@ export default function DashboardPage() {
 
   // --- Handlers ---
   const handleToggleComplete = async (event: Event) => {
+    // Optimistic update
     const updatedStatus = !event.completed
     setTodayEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: updatedStatus } : e))
     
@@ -151,195 +153,220 @@ export default function DashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completed: updatedStatus })
       })
+      // Refresh streak data to get accurate backend calculation
       const resStreak = await fetch('/api/streak')
       if (resStreak.ok) {
-        setStreak(await resStreak.json())
+        const streakData = await resStreak.json()
+        setStreak(streakData)
       }
     } catch (error) {
+      // Revert on error
       setTodayEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: !updatedStatus } : e))
     }
   }
 
-  const handleDelete = async (id: string, isToday: boolean) => {
-    if (!confirm('Delete this event?')) return
-    if (isToday) setTodayEvents(prev => prev.filter(e => e.id !== id))
-    else setUpcomingEvents(prev => prev.filter(e => e.id !== id))
+  // --- Derived State ---
+  const highestPriorityUpcoming = upcomingEvents.length > 0 
+    ? upcomingEvents.filter(e => !e.completed).sort((a, b) => b.priority - a.priority || new Date(a.event_date).getTime() - new Date(b.event_date).getTime())[0]
+    : null
 
-    try {
-      await fetch(`/api/events/${id}`, { method: 'DELETE' })
-    } catch (err) {
-      fetchData() // rollback on error
-    }
-  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6 animate-pulse pb-24">
+      <div className="min-h-screen bg-gray-50 p-6 animate-pulse pb-24">
         <div className="flex justify-between items-center mb-8">
-          <div className="w-48 h-8 bg-surface rounded"></div>
-          <div className="w-10 h-10 bg-surface rounded-full"></div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+            <div className="w-32 h-6 bg-gray-200 rounded"></div>
+          </div>
+          <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
         </div>
-        <div className="w-full h-32 bg-surface rounded-2xl mb-8"></div>
+        <div className="w-48 h-4 bg-gray-200 rounded mb-6"></div>
+        <div className="w-full h-32 bg-gray-200 rounded-2xl mb-8"></div>
+        <div className="w-32 h-6 bg-gray-200 rounded mb-4"></div>
         <div className="space-y-4">
-          <div className="w-full h-20 bg-surface rounded-2xl"></div>
-          <div className="w-full h-20 bg-surface rounded-2xl"></div>
+          <div className="w-full h-20 bg-gray-200 rounded-xl"></div>
+          <div className="w-full h-20 bg-gray-200 rounded-xl"></div>
         </div>
       </div>
     )
   }
 
-  const percentage = streak && streak.today.total > 0 ? (streak.today.completed / streak.today.total) * 100 : 0
-  const dashArray = 2 * Math.PI * 36
-  const dashOffset = dashArray - (dashArray * percentage) / 100
-
   return (
-    <div className="min-h-screen bg-background pb-24 font-sans text-text-primary">
-      <main className="p-5 max-w-[480px] mx-auto">
-        
-        {/* Top Bar */}
-        <header className="flex justify-between items-center mb-6">
-          <h1 className="text-lg font-bold tracking-tight">
-            {getGreeting()} {userName} ☀️
-          </h1>
-          <div className="w-10 h-10 bg-surface border border-border text-text-primary rounded-full flex items-center justify-center font-bold">
-            {userName.charAt(0).toUpperCase()}
+    <div className="min-h-screen bg-gray-50 pb-24 font-sans text-gray-900">
+      
+      <main className="p-6 max-w-md mx-auto">
+        {/* Header */}
+        <header className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-bold text-lg">
+              {userName.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">{getGreeting()}, {userName}</h1>
+            </div>
           </div>
+          <button className="p-2 bg-white rounded-full shadow-sm relative">
+            <Bell className="w-5 h-5 text-gray-600" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+          </button>
         </header>
 
-        {/* Streak Card */}
-        {streak && (
-          <div className="card-pulse bg-gradient-to-br from-accent-amber/20 to-accent-amber-2/20 border-accent-amber/30 mb-6 flex justify-between items-center">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="text-3xl">🔥</span>
-                <span className="text-4xl font-black text-accent-amber">{streak.current_streak}</span>
-              </div>
-              <span className="text-sm font-semibold text-text-muted mt-1 uppercase tracking-wider">day streak</span>
-            </div>
+        {/* Date Line */}
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{formatDateLine()}</h2>
+          <p className="text-sm text-gray-600 mt-1">Here's what needs your attention today.</p>
+        </div>
 
-            <div className="flex flex-col items-center">
-              <div className="relative w-24 h-24 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
-                  <circle cx="40" cy="40" r="36" className="stroke-surface" strokeWidth="8" fill="none" />
-                  <circle 
-                    cx="40" cy="40" r="36" 
-                    className="stroke-accent-amber transition-all duration-1000 ease-out" 
-                    strokeWidth="8" fill="none" strokeLinecap="round"
-                    strokeDasharray={dashArray}
-                    strokeDashoffset={dashOffset}
-                  />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-lg font-bold">{Math.round(percentage)}%</span>
-                </div>
-              </div>
-              <span className="text-xs font-semibold text-text-muted mt-2">
-                {streak.today.completed}/{streak.today.total} tasks done
+        {/* Progress Card */}
+        {streak && (
+          <div className="bg-slate-900 text-white rounded-2xl p-5 mb-8 shadow-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-semibold text-slate-100">Today's Progress</h3>
+              <span className="bg-slate-800 text-slate-300 text-xs px-2.5 py-1 rounded-full font-medium">
+                {streak.today.completed} / {streak.today.total} Tasks completed
               </span>
+            </div>
+            <div className="w-full bg-slate-800 rounded-full h-2.5 mb-4">
+              <div 
+                className="bg-blue-500 h-2.5 rounded-full transition-all duration-500" 
+                style={{ width: `${streak.today.total > 0 ? (streak.today.completed / streak.today.total) * 100 : 0}%` }}
+              ></div>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-slate-300 font-medium">
+              <span>🔥</span>
+              <span>{streak.current_streak} day streak - Keep it going!</span>
             </div>
           </div>
         )}
 
         {/* Conflict Banner */}
         {conflicts.length > 0 && (
-          <div className="bg-accent-amber text-black rounded-2xl p-4 mb-6 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
-            <Zap className="w-6 h-6 flex-shrink-0 mt-0.5 fill-black" />
-            <div>
-              <h4 className="font-black">Schedule Conflict</h4>
-              <p className="text-sm font-medium mt-1">
-                You have {conflicts[0].count} tasks on {new Date(conflicts[0].date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} — plan ahead
-              </p>
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-8 flex flex-col gap-3">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-yellow-800">Schedule Conflict</h4>
+                <p className="text-sm text-yellow-700 mt-1">
+                  {conflicts[0].count} important events on {new Date(conflicts[0].date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                </p>
+              </div>
             </div>
+            <Link href="/conflicts" className="text-sm font-bold text-yellow-800 hover:text-yellow-900 flex items-center gap-1 self-end">
+              Review Conflict <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         )}
 
         {/* Today's Tasks */}
-        <section className="mb-8">
+        <section className="mb-10">
           <div className="flex justify-between items-end mb-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              Today <span className="bg-surface border border-border text-text-muted px-2 py-0.5 rounded-full text-xs">{todayEvents.length}</span>
-            </h3>
+            <h3 className="text-lg font-bold">Today's Tasks</h3>
+            <Link href="/tasks" className="text-sm text-blue-600 font-medium hover:underline">
+              View all →
+            </Link>
           </div>
           
           <div className="space-y-3">
             {todayEvents.length === 0 ? (
-              <div className="card-pulse flex flex-col items-center justify-center text-center py-10 opacity-70">
-                <CheckCircle2 className="w-10 h-10 text-success-green mb-3 opacity-50" />
-                <p className="font-medium text-text-muted">✅ Nothing today. Enjoy your day!</p>
+              <div className="bg-white border border-gray-100 rounded-xl p-8 text-center text-gray-500 shadow-sm">
+                <CheckCircle2 className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                <p>Nothing due today — enjoy the break!</p>
               </div>
             ) : (
               todayEvents.map((event) => (
-                <div key={event.id} className="card-pulse p-4 flex items-center gap-4 transition-all group">
-                  <button onClick={() => handleToggleComplete(event)} className="flex-shrink-0 focus:outline-none">
+                <div key={event.id} className="bg-white border border-gray-100 rounded-xl p-4 flex items-start gap-3 shadow-sm transition-all hover:shadow-md">
+                  <button 
+                    onClick={() => handleToggleComplete(event)}
+                    className="mt-1 flex-shrink-0 focus:outline-none"
+                  >
                     {event.completed 
-                      ? <CheckCircle2 className="w-6 h-6 text-success-green fill-success-green/20" /> 
-                      : <Circle className="w-6 h-6 text-border" />
+                      ? <CheckCircle2 className="w-6 h-6 text-blue-500" /> 
+                      : <Circle className="w-6 h-6 text-gray-300" />
                     }
                   </button>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-semibold truncate ${event.completed ? 'text-text-muted line-through' : 'text-text-primary'}`}>
+                    <p className={`font-semibold truncate ${event.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
                       {event.title}
                     </p>
-                    <div className="flex items-center gap-2 mt-2 overflow-x-auto no-scrollbar">
-                      <span className={getPriorityClass(event.priority)}>
-                        {getPriorityLabel(event.priority)}
+                    <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                      <span className="flex items-center gap-1 text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full uppercase">
+                        {getCategoryIcon(event.category)}
+                        {event.category}
                       </span>
-                      <span className="chip bg-surface text-text-muted border border-border flex items-center gap-1">
-                        {getCategoryIcon(event.category)} <span className="capitalize">{event.category}</span>
-                      </span>
-                      <span className="text-xs text-text-muted font-mono whitespace-nowrap ml-1">
+                      <span className="text-xs text-gray-500 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
                         {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => handleDelete(event.id, true)} className="p-2 text-text-muted hover:text-danger-red opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {event.priority > 1 && (
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded flex-shrink-0 ${getPriorityColor(event.priority)}`}>
+                      {getPriorityLabel(event.priority)}
+                    </span>
+                  )}
                 </div>
               ))
             )}
           </div>
         </section>
 
+        {/* Next Reminder Card */}
+        {highestPriorityUpcoming && (
+          <section className="mb-10">
+            <h3 className="text-lg font-bold mb-4">Next Reminder</h3>
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+              <div className="flex justify-between items-start mb-3">
+                <span className={`text-[10px] font-bold px-2 py-1 rounded ${getPriorityColor(highestPriorityUpcoming.priority)}`}>
+                  {getPriorityLabel(highestPriorityUpcoming.priority)}
+                </span>
+                <span className="text-xs font-semibold text-gray-500 uppercase">
+                  {new Date(highestPriorityUpcoming.event_date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+              <h4 className="font-bold text-lg mb-1 truncate">{highestPriorityUpcoming.title}</h4>
+              <p className="text-sm text-gray-500 mb-5">PulseX will remind you automatically.</p>
+              <Link 
+                href={`/reminder-plan/${highestPriorityUpcoming.id}`}
+                className="block w-full bg-black text-white text-center py-3 rounded-xl font-medium hover:bg-gray-900 transition-colors"
+              >
+                View Reminder Plan
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* Coming Up */}
-        <section className="mb-8">
-          <div className="flex justify-between items-end mb-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              Coming Up <span className="bg-surface border border-border text-text-muted px-2 py-0.5 rounded-full text-xs">7 days</span>
-            </h3>
-          </div>
-          
-          <div className="space-y-3">
+        <section className="mb-10">
+          <h3 className="text-lg font-bold mb-4">Coming Up</h3>
+          <div className="space-y-4 pl-2 border-l-2 border-gray-100">
             {upcomingEvents.length === 0 ? (
-              <p className="text-sm text-text-muted py-2 text-center">No upcoming events this week.</p>
+              <p className="text-sm text-gray-500 py-2">No upcoming events.</p>
             ) : (
               upcomingEvents.slice(0, 5).map((event) => {
+                const isHighPriority = event.priority >= 3
                 const daysDiff = Math.ceil((new Date(event.event_date).getTime() - new Date().getTime()) / (1000 * 3600 * 24))
-                let timeColor = 'bg-success-green/10 text-success-green border-success-green/30'
-                if (daysDiff <= 1) timeColor = 'bg-danger-red/10 text-danger-red border-danger-red/30'
-                else if (daysDiff <= 3) timeColor = 'bg-accent-amber/10 text-accent-amber border-accent-amber/30'
-
+                
                 return (
-                  <div key={event.id} className="card-pulse p-4 flex items-center gap-4 group">
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-semibold truncate text-text-primary`}>
-                        {event.title}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2 overflow-x-auto no-scrollbar">
-                        <span className={`chip border ${timeColor}`}>
-                          In {daysDiff} day{daysDiff !== 1 && 's'}
-                        </span>
-                        <span className={getPriorityClass(event.priority)}>
-                          {getPriorityLabel(event.priority)}
-                        </span>
-                        <span className="text-xs text-text-muted font-mono whitespace-nowrap ml-1">
-                           {new Date(event.event_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
-                        </span>
+                  <div key={event.id} className="relative pl-6">
+                    {/* Timeline dot */}
+                    <div className={`absolute -left-[27px] top-1.5 w-3 h-3 rounded-full bg-white border-2 
+                      ${event.completed ? 'border-gray-300 bg-gray-300' : (isHighPriority ? 'border-red-500' : 'border-blue-500')}
+                    `}></div>
+                    
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className={`font-semibold ${event.completed ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
+                          {event.title}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {new Date(event.event_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                        </p>
                       </div>
+                      <span className="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap">
+                        In {daysDiff} days
+                      </span>
                     </div>
-                    <button onClick={() => handleDelete(event.id, false)} className="p-2 text-text-muted hover:text-danger-red opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 )
               })
@@ -352,28 +379,31 @@ export default function DashboardPage() {
       {/* Floating Action Button */}
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-accent-amber text-black rounded-full shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center justify-center hover:bg-accent-amber-2 transition-transform active:scale-95 z-40"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl flex items-center justify-center hover:bg-blue-700 transition-transform active:scale-95 z-40"
       >
         <Plus className="w-6 h-6" />
       </button>
 
       {/* Bottom Navigation */}
-      {/* We will implement the global bottom nav component later, providing a stub for now */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-border px-6 py-3 pb-safe z-30">
-        <div className="max-w-[480px] mx-auto flex justify-between items-center">
-          <Link href="/dashboard" className="flex flex-col items-center gap-1 text-accent-amber">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 pb-safe z-30">
+        <div className="max-w-md mx-auto flex justify-between items-center">
+          <Link href="/dashboard" className="flex flex-col items-center gap-1 text-blue-600">
             <Home className="w-6 h-6" />
-            <span className="text-[10px] font-bold">Home</span>
+            <span className="text-[10px] font-medium">Home</span>
           </Link>
-          <Link href="/upload" className="flex flex-col items-center gap-1 text-text-muted hover:text-text-primary transition-colors">
+          <Link href="/schedule" className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-900">
             <CalendarDays className="w-6 h-6" />
-            <span className="text-[10px] font-medium">Add</span>
+            <span className="text-[10px] font-medium">Schedule</span>
           </Link>
-          <Link href="/streak" className="flex flex-col items-center gap-1 text-text-muted hover:text-text-primary transition-colors">
-            <Zap className="w-6 h-6" />
-            <span className="text-[10px] font-medium">Streak</span>
+          <Link href="/reminders" className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-900">
+            <Bell className="w-6 h-6" />
+            <span className="text-[10px] font-medium">Reminders</span>
           </Link>
-          <Link href="/profile" className="flex flex-col items-center gap-1 text-text-muted hover:text-text-primary transition-colors">
+          <Link href="/conflicts" className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-900">
+            <AlertTriangle className="w-6 h-6" />
+            <span className="text-[10px] font-medium">Conflicts</span>
+          </Link>
+          <Link href="/profile" className="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-900">
             <User className="w-6 h-6" />
             <span className="text-[10px] font-medium">Profile</span>
           </Link>
