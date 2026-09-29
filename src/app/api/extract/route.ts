@@ -4,6 +4,17 @@ import { classifyPriority } from '@/utils/classification'
 import mammoth from 'mammoth'
 import * as xlsx from 'xlsx'
 
+// Polyfill for pdf-parse (pdf.js dependency) which requires DOM APIs in Next.js
+if (typeof globalThis.DOMMatrix === 'undefined') {
+  ;(globalThis as any).DOMMatrix = class {}
+}
+if (typeof globalThis.ImageData === 'undefined') {
+  ;(globalThis as any).ImageData = class {}
+}
+if (typeof globalThis.Path2D === 'undefined') {
+  ;(globalThis as any).Path2D = class {}
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData()
