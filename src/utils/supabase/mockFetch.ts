@@ -20,7 +20,7 @@ export const mockFetch = async (input: RequestInfo | URL, init?: RequestInit): P
         access_token: "mock-token-xyz",
         token_type: "bearer",
         expires_in: 3600,
-        refresh_token: "mock-refresh-xyz",
+        refresh_token: "mock-refresh-xyz", 
         user: { 
           id: "mock-user-123", 
           email: "test@example.com", 

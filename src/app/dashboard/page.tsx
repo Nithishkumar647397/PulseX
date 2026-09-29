@@ -101,13 +101,14 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      
       if (!user) {
         router.push('/login')
         return
       }
       
       // Attempt to get name from raw_user_meta_data or profiles
-      setUserName(user.user_metadata?.full_name?.split(' ')[0] || 'User')
+      setUserName(user?.user_metadata?.full_name?.split(' ')[0] || 'Demo User')
 
       const [resToday, resUpcoming, resConflicts, resStreak] = await Promise.all([
         fetch('/api/events/today'),
@@ -116,10 +117,10 @@ export default function DashboardPage() {
         fetch('/api/streak')
       ])
 
-      const todayData = await resToday.json()
-      const upcomingData = await resUpcoming.json()
-      const conflictsData = await resConflicts.json()
-      const streakData = await resStreak.json()
+      const todayData = resToday.ok ? await resToday.json() : { events: [] }
+      const upcomingData = resUpcoming.ok ? await resUpcoming.json() : { events: [] }
+      const conflictsData = resConflicts.ok ? await resConflicts.json() : { conflicts: [] }
+      const streakData = resStreak.ok ? await resStreak.json() : null
 
       setTodayEvents(todayData.events || [])
       setConflicts(conflictsData.conflicts || [])
@@ -154,8 +155,10 @@ export default function DashboardPage() {
       })
       // Refresh streak data to get accurate backend calculation
       const resStreak = await fetch('/api/streak')
-      const streakData = await resStreak.json()
-      setStreak(streakData)
+      if (resStreak.ok) {
+        const streakData = await resStreak.json()
+        setStreak(streakData)
+      }
     } catch (error) {
       // Revert on error
       setTodayEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: !updatedStatus } : e))
