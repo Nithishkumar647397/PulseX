@@ -13,12 +13,10 @@ export async function GET(request: Request) {
   const now = new Date()
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const startOfTomorrow = new Date(startOfToday)
-  startOfTomorrow.setDate(startOfTomorrow.getDate() + 1)
+  startOfTomorrow.setDate(startOfTomorrow.get Date() + 1)
 
   const { data, error } = await supabase
-    .from('events')
-    .select('*')
-    .eq('user_id', user.id)
+    .from('events')  
     .gte('event_date', startOfToday.toISOString())
     .lt('event_date', startOfTomorrow.toISOString())
     .order('event_date', { ascending: true })
