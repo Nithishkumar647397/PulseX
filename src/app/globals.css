@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0F172A;
+  --surface: #1E293B;
+  --border: #2D3F55;
+  --text-primary: #F1F5F9;
+  --text-muted: #94A3B8;
+  --accent-amber: #F59E0B;
+  --accent-amber-2: #D97706;
+  --success-green: #10B981;
+  --danger-red: #EF4444;
+  --purple: #8B5CF6;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-amber-2: var(--accent-amber-2);
+  --color-success-green: var(--success-green);
+  --color-danger-red: var(--danger-red);
+  --color-purple: var(--purple);
+  
+  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Custom Utilities for PulseX */
+@layer utilities {
+  .card-pulse {
+    @apply bg-surface border border-border rounded-2xl p-5 shadow-lg;
+  }
+  .btn-primary {
+    @apply bg-accent-amber text-black font-bold rounded-xl py-3 px-6 hover:bg-accent-amber-2 transition-all active:scale-95 text-center flex justify-center items-center;
+  }
+  .btn-ghost {
+    @apply border border-border text-slate-300 rounded-xl py-3 px-6 hover:border-slate-400 transition-all text-center flex justify-center items-center;
+  }
+  .input-pulse {
+    @apply w-full bg-background border border-border text-text-primary rounded-xl p-3 focus:border-accent-amber focus:ring-1 focus:ring-accent-amber outline-none transition-all placeholder:text-text-muted;
+  }
+  .chip {
+    @apply rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap;
+  }
+  .chip-exam {
+    @apply chip bg-red-500/10 text-red-400 border border-red-500/30;
+  }
+  .chip-high {
+    @apply chip bg-orange-500/10 text-orange-400 border border-orange-500/30;
+  }
+  .chip-medium {
+    @apply chip bg-blue-500/10 text-blue-400 border border-blue-500/30;
+  }
+  .chip-low {
+    @apply chip bg-slate-500/10 text-slate-400 border border-slate-500/30;
+  }
 }

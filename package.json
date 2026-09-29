@@ -12,10 +12,13 @@
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "lucide-react": "^1.38.0",
+    "mammoth": "^1.13.0",
     "next": "16.3.4",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "resend": "^6.30.0"
+    "resend": "^6.30.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
