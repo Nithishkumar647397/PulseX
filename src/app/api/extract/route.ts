@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { classifyPriority } from '@/utils/classification'
-import pdfParse from 'pdf-parse'
+// pdfParse required dynamically inside POST handler
 import mammoth from 'mammoth'
 import * as xlsx from 'xlsx'
 
@@ -20,6 +20,8 @@ export async function POST(request: Request) {
     const fileName = file.name.toLowerCase()
 
     if (mimeType === 'application/pdf' || fileName.endsWith('.pdf')) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const pdfParse = require('pdf-parse')
       const data = await pdfParse(buffer)
       text = data.text
     } else if (fileName.endsWith('.docx') || mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
