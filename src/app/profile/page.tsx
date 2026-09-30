@@ -287,7 +287,7 @@ function InfoRow({ icon, label, value, isEdit, isDate = false, noBorder = false,
           <input 
             type={isDate ? 'date' : 'text'}
             value={value}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => onChange?.(e.target.value)}
             className="w-full bg-transparent text-white text-sm font-medium outline-none border-b border-amber-500/30 focus:border-amber-500 pb-1 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
           />
         ) : (

@@ -19,7 +19,7 @@ type SentLog = {
   event_id: string
   reminder_stage: string
   sent_at: string
-  event?: { title: string, priority: number }
+  event?: { title: string; priority: number; category: string }
 }
 
 type Event = {
