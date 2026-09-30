@@ -122,7 +122,7 @@ export default function AddEventModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-[#0A0F1E]/80 backdrop-blur-sm"
+          className="absolute inset-0 bg-[#0F172A]/50 backdrop-blur-sm"
         />
         
         <motion.div 
@@ -136,15 +136,15 @@ export default function AddEventModal({
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-          className="relative w-full max-w-[430px] bg-[#111827] rounded-t-3xl max-h-[90vh] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-[#1F2937]"
+          className="relative w-full max-w-[430px] bg-white rounded-t-3xl max-h-[90vh] flex flex-col shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-[#E2E8F0]"
         >
           {/* Handle */}
-          <div className="w-[36px] h-[4px] bg-[#374151] rounded-full mx-auto mt-3 shrink-0" />
+          <div className="w-[36px] h-[4px] bg-[#E2E8F0] rounded-full mx-auto mt-3 shrink-0" />
           
           {/* Header */}
           <div className="flex justify-between items-center px-6 pt-4 pb-2 shrink-0">
-            <h2 className="text-white font-bold text-[18px]">New Event</h2>
-            <button onClick={onClose} className="p-2 -mr-2 text-slate-400 hover:text-white transition-colors">
+            <h2 className="text-[#0F172A] font-bold text-[18px]">New Event</h2>
+            <button onClick={onClose} className="p-2 -mr-2 text-slate-400 hover:text-slate-600 transition-colors">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -160,7 +160,7 @@ export default function AddEventModal({
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="What do you need to do?"
-                  className="w-full bg-transparent border-0 border-b border-[#1F2937] focus:border-amber-500 text-white text-[18px] py-2 px-0 outline-none transition-colors placeholder:text-slate-500"
+                  className="w-full bg-transparent border-0 border-b border-[#E2E8F0] focus:border-amber-400 text-[#0F172A] text-[18px] py-2 px-0 outline-none transition-colors placeholder:text-slate-400"
                   autoFocus
                 />
               </div>
@@ -173,7 +173,7 @@ export default function AddEventModal({
                     type="date" 
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-[#0A0F1E] border border-[#1F2937] focus:border-amber-500 rounded-full outline-none text-slate-200 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                    className="w-full pl-10 pr-4 py-3 bg-white border border-[#E2E8F0] focus:border-amber-400 focus:ring-1 focus:ring-amber-100 rounded-full outline-none text-[#0F172A] transition-all shadow-sm"
                   />
                 </div>
                 <div className="flex-1 relative">
@@ -182,7 +182,7 @@ export default function AddEventModal({
                     type="time" 
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 bg-[#0A0F1E] border border-[#1F2937] focus:border-amber-500 rounded-full outline-none text-slate-200 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+                    className="w-full pl-10 pr-4 py-3 bg-white border border-[#E2E8F0] focus:border-amber-400 focus:ring-1 focus:ring-amber-100 rounded-full outline-none text-[#0F172A] transition-all shadow-sm"
                   />
                 </div>
               </div>
@@ -194,10 +194,10 @@ export default function AddEventModal({
                     <button
                       key={cat.id}
                       onClick={() => setCategory(cat.id)}
-                      className={`whitespace-nowrap px-4 py-2 rounded-full border transition-colors ${
+                      className={`whitespace-nowrap px-4 py-2 rounded-full border transition-all ${
                         category === cat.id 
-                          ? 'bg-amber-500 border-amber-500 text-black font-semibold' 
-                          : 'bg-[#0A0F1E] border-[#1F2937] text-slate-300 hover:border-amber-500/50'
+                          ? 'bg-amber-100 border-amber-200 text-amber-700 font-bold' 
+                          : 'bg-white border-[#E2E8F0] text-slate-500 hover:border-amber-300 hover:bg-slate-50'
                       }`}
                     >
                       {cat.label}
@@ -207,29 +207,29 @@ export default function AddEventModal({
               </div>
 
               {/* Priority */}
-              <div className="bg-[#0A0F1E] border border-[#1F2937] rounded-2xl p-4">
+              <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-4">
                 {!showPriorityOverride ? (
                   <div 
                     className="flex justify-between items-center cursor-pointer"
                     onClick={() => setShowPriorityOverride(true)}
                   >
-                    <span className="text-slate-300 font-medium">
+                    <span className="text-[#0F172A] font-medium">
                       Auto-detected: {getCategoryEmoji(category)} {getPriorityLabel(activePriority)}
                     </span>
-                    <span className="text-amber-500 text-sm">Edit</span>
+                    <span className="text-amber-500 text-sm font-bold">Edit</span>
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">Set Priority</span>
+                    <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">Set Priority</span>
                     <div className="flex gap-2">
                       {[1, 2, 3, 4].map(p => (
                         <button
                           key={p}
                           onClick={() => { setManualPriority(p); setShowPriorityOverride(false) }}
-                          className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                          className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
                             activePriority === p 
-                              ? 'bg-amber-500 text-black' 
-                              : 'bg-[#1F2937] text-slate-300 hover:bg-[#374151]'
+                              ? 'bg-amber-500 text-white' 
+                              : 'bg-white text-slate-500 border border-[#E2E8F0] hover:bg-slate-50'
                           }`}
                         >
                           {p === 1 ? 'LOW' : p === 2 ? 'MED' : p === 3 ? 'HIGH' : 'MAX'}
@@ -249,10 +249,10 @@ export default function AddEventModal({
                     exit={{ opacity: 0, height: 0 }}
                     className="flex justify-between items-center overflow-hidden"
                   >
-                    <span className="text-slate-300 font-medium">Repeat yearly</span>
+                    <span className="text-[#0F172A] font-medium">Repeat yearly</span>
                     <button 
                       onClick={() => setRepeatYearly(!repeatYearly)}
-                      className={`w-12 h-6 rounded-full p-1 transition-colors ${repeatYearly ? 'bg-amber-500' : 'bg-[#374151]'}`}
+                      className={`w-12 h-6 rounded-full p-1 transition-colors ${repeatYearly ? 'bg-amber-500' : 'bg-slate-200'}`}
                     >
                       <motion.div 
                         layout
@@ -269,7 +269,7 @@ export default function AddEventModal({
                 <button 
                   onClick={handleSubmit}
                   disabled={!isFormValid || isSubmitting}
-                  className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white shadow-sm font-bold py-4 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Add to Schedule'}
                 </button>

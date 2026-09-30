@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0A0F1E',
+  themeColor: '#F8FAFC',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -25,9 +25,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased dark`}
+      className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#0A0F1E] text-slate-200 selection:bg-amber-500/30 selection:text-amber-200 pb-[env(safe-area-inset-bottom)]">
+      <body className="min-h-full bg-[#F8FAFC] text-[#0F172A] selection:bg-amber-100 selection:text-amber-700 pb-[env(safe-area-inset-bottom)]">
         <Navigation />
         <main className="md:ml-64 min-h-screen flex justify-center w-full">
           <div className="w-full max-w-[430px] min-h-screen relative pb-20 md:pb-0 overflow-x-hidden">
