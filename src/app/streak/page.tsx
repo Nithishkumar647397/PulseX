@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { ValueType } from 'recharts/types/component/DefaultTooltipContent'
 
 type StreakData = {
   current_streak: number
@@ -216,9 +215,9 @@ export default function StreakPage() {
                 cursor={{ fill: '#1F2937', radius: 4 }}
                 contentStyle={{ backgroundColor: '#0A0F1E', border: '1px solid #1F2937', borderRadius: '12px', color: '#fff' }}
                 itemStyle={{ color: '#F59E0B', fontWeight: 'bold' }}
-                formatter={(value: ValueType | undefined) => {
+                formatter={(value: number | string | readonly (number | string)[] | undefined) => {
                   const num = typeof value === 'number' ? value : 0
-                  return [`${num} tasks`, 'Completed']
+                  return [`${num} tasks`, 'Completed'] as [string, string]
                 }}
                 labelStyle={{ display: 'none' }}
               />
