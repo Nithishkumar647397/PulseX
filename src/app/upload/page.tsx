@@ -117,11 +117,11 @@ export default function UploadPage() {
   const selectedCount = extractedEvents.filter(e => e.selected).length
 
   return (
-    <div className="min-h-screen bg-[#0A0F1E] pt-12 pb-24 font-sans flex flex-col items-center">
+    <div className="min-h-screen bg-[#F8FAFC] pt-12 pb-24 font-sans flex flex-col items-center">
       
       {/* HEADER */}
       <header className="w-full px-5 mb-8">
-        <h1 className="text-[24px] font-bold text-white">Import Schedule</h1>
+        <h1 className="text-[24px] font-bold text-[#0F172A]">Import Schedule</h1>
       </header>
 
       {/* UPLOAD STATE */}
@@ -144,17 +144,17 @@ export default function UploadPage() {
             />
             <label 
               htmlFor="file-upload" 
-              className="block bg-[#111827] border-2 border-dashed border-[#1F2937] hover:border-amber-500/50 hover:bg-amber-500/5 transition-all rounded-3xl p-10 text-center cursor-pointer"
+              className="block bg-white border-2 border-dashed border-[#E2E8F0] hover:border-amber-400 hover:bg-amber-50 transition-all rounded-3xl p-10 text-center cursor-pointer shadow-sm"
             >
-              <CloudUpload className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-              <p className="text-white text-[16px] font-semibold mb-1">Drop your file here</p>
+              <CloudUpload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <p className="text-[#0F172A] text-[16px] font-semibold mb-1">Drop your file here</p>
               <p className="text-slate-500 text-[14px] mb-6">or tap to browse</p>
               
               <div className="flex justify-center gap-2">
-                <span className="bg-red-500/10 text-red-400 text-xs font-bold px-2.5 py-1 rounded-md border border-red-500/20">PDF</span>
-                <span className="bg-blue-500/10 text-blue-400 text-xs font-bold px-2.5 py-1 rounded-md border border-blue-500/20">DOCX</span>
-                <span className="bg-green-500/10 text-green-400 text-xs font-bold px-2.5 py-1 rounded-md border border-green-500/20">XLSX</span>
-                <span className="bg-amber-500/10 text-amber-400 text-xs font-bold px-2.5 py-1 rounded-md border border-amber-500/20">CSV</span>
+                <span className="bg-red-50 text-red-600 text-xs font-bold px-2.5 py-1 rounded-md border border-red-200">PDF</span>
+                <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-md border border-blue-200">DOCX</span>
+                <span className="bg-green-50 text-green-600 text-xs font-bold px-2.5 py-1 rounded-md border border-green-200">XLSX</span>
+                <span className="bg-orange-50 text-orange-600 text-xs font-bold px-2.5 py-1 rounded-md border border-orange-200">CSV</span>
               </div>
             </label>
 
@@ -162,7 +162,7 @@ export default function UploadPage() {
             <div className="mt-8">
               <button 
                 onClick={() => setShowManual(!showManual)}
-                className="flex items-center gap-2 text-slate-400 font-semibold text-sm mx-auto hover:text-white transition-colors"
+                className="flex items-center gap-2 text-slate-500 font-semibold text-sm mx-auto hover:text-slate-800 transition-colors"
               >
                 Or add manually <ChevronDown className={`w-4 h-4 transition-transform ${showManual ? 'rotate-180' : ''}`} />
               </button>
@@ -175,10 +175,9 @@ export default function UploadPage() {
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div className="bg-[#111827] border border-[#1F2937] rounded-3xl p-6 mt-4">
-                      {/* Simple inline form placeholder */}
-                      <p className="text-slate-400 text-sm text-center mb-4">Use the (+) button to add manually.</p>
-                      <button onClick={() => router.push('/dashboard')} className="w-full bg-[#1F2937] text-white py-3 rounded-xl font-semibold">
+                    <div className="bg-white border border-[#E2E8F0] shadow-sm rounded-3xl p-6 mt-4">
+                      <p className="text-slate-500 text-sm text-center mb-4">Use the (+) button to add manually.</p>
+                      <button onClick={() => router.push('/dashboard')} className="w-full bg-amber-500 text-white hover:bg-amber-600 py-3 rounded-xl font-bold">
                         Go to Dashboard
                       </button>
                     </div>
@@ -201,10 +200,10 @@ export default function UploadPage() {
               <div className="absolute inset-0 bg-amber-500/20 blur-[30px] rounded-full" />
               <FileTextIcon className="w-16 h-16 text-amber-500 relative z-10 animate-bounce" />
             </div>
-            <h2 className="text-slate-300 text-xl font-bold mb-2">Reading your file...</h2>
+            <h2 className="text-[#0F172A] text-xl font-bold mb-2">Reading your file...</h2>
             <p className="text-slate-500 text-[13px] mb-8">AI is extracting dates and events</p>
             
-            <div className="w-48 h-1.5 bg-[#1F2937] rounded-full overflow-hidden">
+            <div className="w-48 h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
               <motion.div 
                 className="h-full bg-amber-500 rounded-full w-1/2"
                 animate={{ x: [-100, 200] }}
@@ -223,13 +222,13 @@ export default function UploadPage() {
             className="w-full px-4 flex flex-col"
           >
             <div className="flex items-center gap-2 mb-4">
-              <span className="bg-green-500/20 text-green-400 border border-green-500/30 px-3 py-1 rounded-full text-[18px] font-bold">
+              <span className="bg-green-50 text-green-600 border border-green-200 px-3 py-1 rounded-full text-[14px] font-bold">
                 Found {extractedEvents.length} events
               </span>
             </div>
 
-            <div className="bg-[#111827] rounded-2xl border border-[#1F2937] overflow-hidden">
-              <div className="grid grid-cols-[auto_1fr_auto_auto] gap-3 px-4 py-3 bg-[#1F2937]/50 border-b border-[#1F2937] text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+            <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden shadow-sm">
+              <div className="grid grid-cols-[auto_1fr_auto_auto] gap-3 px-4 py-3 bg-[#F8FAFC] border-b border-[#E2E8F0] text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 <div className="w-5"></div>
                 <div>Event</div>
                 <div>Date</div>
@@ -240,30 +239,30 @@ export default function UploadPage() {
                 {extractedEvents.map((ev, i) => (
                   <div 
                     key={i} 
-                    className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 px-4 py-3 border-b border-[#1F2937]/50 last:border-0 ${i % 2 === 0 ? 'bg-[#111827]' : 'bg-[#0F172A]'}`}
+                    className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 px-4 py-3 border-b border-[#E2E8F0] last:border-0 ${i % 2 === 0 ? 'bg-white' : 'bg-[#F8FAFC]'}`}
                   >
                     <input 
                       type="checkbox"
                       checked={ev.selected}
                       onChange={(e) => handleRowChange(i, 'selected', e.target.checked)}
-                      className="w-5 h-5 rounded bg-[#0A0F1E] border-[#1F2937] text-amber-500 focus:ring-amber-500"
+                      className="w-5 h-5 rounded bg-white border-[#E2E8F0] text-amber-500 focus:ring-amber-500"
                     />
                     <input 
                       type="text"
                       value={ev.title}
                       onChange={(e) => handleRowChange(i, 'title', e.target.value)}
-                      className="bg-transparent text-white text-sm font-medium w-full outline-none focus:border-b focus:border-amber-500"
+                      className="bg-transparent text-[#0F172A] text-sm font-medium w-full outline-none focus:border-b focus:border-amber-400"
                     />
                     <input 
                       type="date"
                       value={ev.inputDate}
                       onChange={(e) => handleRowChange(i, 'inputDate', e.target.value)}
-                      className="bg-transparent text-slate-400 text-xs w-[105px] outline-none [&::-webkit-calendar-picker-indicator]:invert"
+                      className="bg-transparent text-slate-500 text-xs w-[105px] outline-none"
                     />
                     <select 
                       value={ev.priority}
                       onChange={(e) => handleRowChange(i, 'priority', parseInt(e.target.value))}
-                      className="bg-[#1F2937] text-white text-[10px] font-bold rounded px-2 py-1 outline-none appearance-none"
+                      className="bg-white border border-[#E2E8F0] text-[#0F172A] text-[10px] font-bold rounded px-2 py-1 outline-none appearance-none"
                     >
                       <option value="4">P4</option>
                       <option value="3">P3</option>
@@ -276,18 +275,18 @@ export default function UploadPage() {
             </div>
 
             <div className="mt-6">
-              <p className="text-slate-400 text-sm text-center mb-4">{selectedCount} of {extractedEvents.length} selected</p>
+              <p className="text-slate-500 text-sm text-center mb-4">{selectedCount} of {extractedEvents.length} selected</p>
               <button 
                 onClick={handleBulkSubmit}
                 disabled={isSubmitting || selectedCount === 0}
-                className="w-full bg-amber-500 text-black font-bold py-4 rounded-2xl mb-3 flex items-center justify-center gap-2 hover:bg-amber-400 transition-colors disabled:opacity-50"
+                className="w-full bg-amber-500 text-white font-bold py-4 rounded-2xl mb-3 flex items-center justify-center gap-2 hover:bg-amber-600 transition-colors disabled:opacity-50 shadow-sm"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Import Selected'}
               </button>
               <button 
                 onClick={() => setMode('upload')}
                 disabled={isSubmitting}
-                className="w-full py-3 text-slate-400 font-semibold hover:text-white transition-colors"
+                className="w-full py-3 text-slate-500 font-semibold hover:text-[#0F172A] transition-colors"
               >
                 Cancel
               </button>
@@ -313,11 +312,11 @@ export default function UploadPage() {
               <CheckCircle2 className="w-20 h-20 text-green-500 relative z-10" />
             </motion.div>
             
-            <h2 className="text-white text-[22px] font-bold mb-2">{selectedCount} events added!</h2>
+            <h2 className="text-[#0F172A] text-[22px] font-bold mb-2">{selectedCount} events added!</h2>
             
             <button 
               onClick={() => router.push('/dashboard')}
-              className="text-amber-500 font-semibold mt-4 flex items-center gap-1 hover:text-amber-400"
+              className="text-amber-500 font-semibold mt-4 flex items-center gap-1 hover:text-amber-600"
             >
               View your schedule →
             </button>

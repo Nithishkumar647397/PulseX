@@ -26,7 +26,7 @@ const SLIDES = [
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-white text-[28px] font-bold leading-tight mb-4"
+          className="text-[#0F172A] text-[28px] font-bold leading-tight mb-4"
         >
           Never miss what matters.
         </motion.h2>
@@ -34,7 +34,7 @@ const SLIDES = [
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-slate-400 text-[16px]"
+          className="text-slate-500 text-[16px]"
         >
           Your AI agent watches your schedule.
         </motion.p>
@@ -48,15 +48,15 @@ const SLIDES = [
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mb-8 relative"
+          className="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center mb-8 relative border border-amber-100 shadow-sm"
         >
-          <div className="absolute inset-0 bg-amber-500/20 blur-[40px] rounded-full" />
+          <div className="absolute inset-0 bg-amber-500/10 blur-[40px] rounded-full" />
           <Upload className="w-12 h-12 text-amber-500 relative z-10" />
         </motion.div>
-        <h2 className="text-white text-[28px] font-bold leading-tight mb-4">
+        <h2 className="text-[#0F172A] text-[28px] font-bold leading-tight mb-4">
           Upload once.
         </h2>
-        <p className="text-slate-400 text-[16px] leading-relaxed">
+        <p className="text-slate-500 text-[16px] leading-relaxed">
           Drop your timetable PDF, Excel, or Word file. <br/>
           AI reads it and creates all your reminders.
         </p>
@@ -70,9 +70,9 @@ const SLIDES = [
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="w-24 h-24 bg-amber-500/10 rounded-full flex items-center justify-center mb-8 relative"
+          className="w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center mb-8 relative border border-amber-100 shadow-sm"
         >
-          <div className="absolute inset-0 bg-amber-500/20 blur-[40px] rounded-full" />
+          <div className="absolute inset-0 bg-amber-500/10 blur-[40px] rounded-full" />
           <motion.div 
             animate={{ scale: [1, 1.2, 1] }} 
             transition={{ repeat: Infinity, duration: 2 }}
@@ -80,10 +80,10 @@ const SLIDES = [
             <Bell className="w-12 h-12 text-amber-500 relative z-10" />
           </motion.div>
         </motion.div>
-        <h2 className="text-white text-[28px] font-bold leading-tight mb-4">
+        <h2 className="text-[#0F172A] text-[28px] font-bold leading-tight mb-4">
           Agent reminds you.
         </h2>
-        <p className="text-slate-400 text-[16px] leading-relaxed">
+        <p className="text-slate-500 text-[16px] leading-relaxed">
           Exams get 4 reminders. Meetings get 2. <br/>
           Priority-aware, automatically.
         </p>
@@ -105,7 +105,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0F1E] flex flex-col justify-between pt-20 pb-10 overflow-hidden relative">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col justify-between pt-20 pb-10 overflow-hidden relative">
       
       {/* Slides Area */}
       <div className="flex-1 flex items-center justify-center relative w-full h-full">
@@ -141,7 +141,7 @@ export default function OnboardingPage() {
             <div 
               key={i} 
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === currentSlide ? 'bg-amber-500 w-6' : 'bg-[#1F2937]'
+                i === currentSlide ? 'bg-amber-500 w-6' : 'bg-[#E2E8F0]'
               }`}
             />
           ))}
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
 
         <button 
           onClick={nextSlide}
-          className="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-4 rounded-2xl transition-all active:scale-95 text-[18px]"
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white shadow-[0_2px_10px_rgba(245,158,11,0.3)] font-bold py-4 rounded-2xl transition-all active:scale-95 text-[18px]"
         >
           {currentSlide === SLIDES.length - 1 ? 'Get Started →' : 'Next'}
         </button>

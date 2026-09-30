@@ -115,50 +115,50 @@ export default function ProfilePage() {
   }
 
   if (loading) {
-    return <div className="min-h-screen bg-[#0A0F1E] flex justify-center items-center"><div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div></div>
+    return <div className="min-h-screen bg-[#F8FAFC] flex justify-center items-center"><div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div></div>
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0F1E] pb-24">
+    <div className="min-h-screen bg-[#F8FAFC] pb-24">
       
       {/* HEADER */}
       <div className="pt-16 pb-8 px-5 flex flex-col items-center">
         <div className="relative group cursor-pointer mb-4">
-          <div className="w-[72px] h-[72px] rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-lg">
+          <div className="w-[72px] h-[72px] rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md">
             <span className="text-white text-[28px] font-black">{profile.full_name.charAt(0).toUpperCase()}</span>
           </div>
           <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <Pencil className="w-5 h-5 text-white" />
           </div>
         </div>
-        <h1 className="text-[22px] font-bold text-white text-center mb-1">{profile.full_name}</h1>
-        <p className="text-slate-400 text-[14px] text-center mb-6">{profile.email}</p>
+        <h1 className="text-[22px] font-bold text-[#0F172A] text-center mb-1">{profile.full_name}</h1>
+        <p className="text-slate-500 text-[14px] text-center mb-6">{profile.email}</p>
 
-        <div className="flex items-center justify-center bg-[#111827] rounded-xl border border-[#1F2937] p-4 w-full max-w-xs shadow-sm">
-          <div className="flex-1 text-center border-r border-[#1F2937]">
+        <div className="flex items-center justify-center bg-white rounded-xl border border-[#E2E8F0] p-4 w-full max-w-xs shadow-sm">
+          <div className="flex-1 text-center border-r border-[#E2E8F0]">
             <div className="text-amber-500 font-bold text-lg leading-none mb-1">{profile.streak}</div>
-            <div className="text-slate-500 text-[11px] font-medium uppercase tracking-wider">days</div>
+            <div className="text-slate-400 text-[11px] font-medium uppercase tracking-wider">days</div>
           </div>
-          <div className="flex-1 text-center border-r border-[#1F2937]">
+          <div className="flex-1 text-center border-r border-[#E2E8F0]">
             <div className="text-amber-500 font-bold text-lg leading-none mb-1">{profile.totalEvents}</div>
-            <div className="text-slate-500 text-[11px] font-medium uppercase tracking-wider">events</div>
+            <div className="text-slate-400 text-[11px] font-medium uppercase tracking-wider">events</div>
           </div>
           <div className="flex-1 text-center">
-            <div className="text-amber-500 font-bold text-sm leading-none mb-1 whitespace-nowrap">{profile.joinDate}</div>
-            <div className="text-slate-500 text-[11px] font-medium uppercase tracking-wider">member</div>
+            <div className="text-amber-500 font-bold text-sm leading-none mb-1 whitespace-nowrap px-1">{profile.joinDate}</div>
+            <div className="text-slate-400 text-[11px] font-medium uppercase tracking-wider">member</div>
           </div>
         </div>
       </div>
 
-      <div className="px-5 space-y-8">
+      <div className="px-5 space-y-6">
         
         {/* PERSONAL INFO */}
         <section>
           <div className="flex justify-between items-center mb-3">
-            <h2 className="text-white font-bold tracking-tight">Personal Info</h2>
+            <h2 className="text-[#0F172A] font-semibold tracking-tight">Personal Info</h2>
           </div>
           
-          <motion.div layout className="bg-[#111827] rounded-2xl border border-[#1F2937] overflow-hidden">
+          <motion.div layout className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden shadow-sm">
             <InfoRow icon={<User />} label="Full Name" value={profile.full_name} isEdit={isEditMode} onChange={(v) => setProfile({...profile, full_name: v})} />
             
             <div className="relative">
@@ -180,7 +180,7 @@ export default function ProfilePage() {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 onClick={() => setIsEditMode(true)}
-                className="w-full mt-4 bg-[#1F2937] hover:bg-[#374151] text-white py-3.5 rounded-xl font-semibold flex justify-center items-center gap-2 transition-colors"
+                className="w-full mt-4 bg-white border border-[#E2E8F0] hover:bg-slate-50 text-[#0F172A] py-3.5 rounded-xl font-semibold flex justify-center items-center gap-2 transition-colors shadow-sm"
               >
                 <Pencil className="w-4 h-4" /> Edit Profile
               </motion.button>
@@ -194,13 +194,13 @@ export default function ProfilePage() {
               >
                 <button 
                   onClick={handleSave}
-                  className="w-full bg-amber-500 hover:bg-amber-400 text-black py-3.5 rounded-xl font-bold transition-all"
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-sm"
                 >
                   Save Changes
                 </button>
                 <button 
                   onClick={() => setIsEditMode(false)}
-                  className="w-full bg-transparent hover:bg-[#1F2937] text-slate-400 py-3.5 rounded-xl font-semibold transition-colors"
+                  className="w-full bg-transparent hover:bg-slate-100 text-slate-500 py-3.5 rounded-xl font-semibold transition-colors"
                 >
                   Cancel
                 </button>
@@ -211,36 +211,36 @@ export default function ProfilePage() {
 
         {/* PREFERENCES */}
         <section>
-          <h2 className="text-white font-bold tracking-tight mb-3">Preferences</h2>
-          <div className="bg-[#111827] rounded-2xl border border-[#1F2937] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-[#1F2937] cursor-pointer hover:bg-[#1F2937]/30 transition-colors">
+          <h2 className="text-[#0F172A] font-semibold tracking-tight mb-3">Preferences</h2>
+          <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden shadow-sm">
+            <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0] cursor-pointer hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-slate-500" />
+                <Clock className="w-4 h-4 text-slate-400" />
                 <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Reminder Time</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-200 text-sm font-medium">
-                {settings.reminderTime} AM <ChevronRight className="w-4 h-4 text-slate-600" />
+              <div className="flex items-center gap-2 text-[#0F172A] text-sm font-medium">
+                {settings.reminderTime} AM <ChevronRight className="w-4 h-4 text-slate-400" />
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 border-b border-[#1F2937] cursor-pointer hover:bg-[#1F2937]/30 transition-colors">
+            <div className="flex items-center justify-between p-4 border-b border-[#E2E8F0] cursor-pointer hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-3">
-                <Globe className="w-4 h-4 text-slate-500" />
+                <Globe className="w-4 h-4 text-slate-400" />
                 <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Timezone</span>
               </div>
-              <div className="flex items-center gap-2 text-slate-200 text-sm font-medium">
-                {settings.timezone} <ChevronRight className="w-4 h-4 text-slate-600" />
+              <div className="flex items-center gap-2 text-[#0F172A] text-sm font-medium">
+                {settings.timezone} <ChevronRight className="w-4 h-4 text-slate-400" />
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-[#1F2937]/30 transition-colors">
+            <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors">
               <div className="flex items-center gap-3">
-                <Bell className="w-4 h-4 text-slate-500" />
+                <Bell className="w-4 h-4 text-slate-400" />
                 <span className="text-slate-500 text-xs uppercase tracking-wider font-semibold">Notifications</span>
               </div>
               <button 
                 onClick={() => setSettings({...settings, notifications: !settings.notifications})}
-                className={`w-11 h-6 rounded-full p-1 transition-colors ${settings.notifications ? 'bg-amber-500' : 'bg-[#374151]'}`}
+                className={`w-11 h-6 rounded-full p-1 transition-colors ${settings.notifications ? 'bg-amber-500' : 'bg-slate-200'}`}
               >
                 <motion.div 
                   layout
@@ -253,17 +253,17 @@ export default function ProfilePage() {
         </section>
 
         {/* DANGER ZONE */}
-        <section className="pt-6">
+        <section className="pt-2">
           <button 
             onClick={handleSignOut}
-            className="w-full bg-red-500/10 border border-red-500/20 text-red-400 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-red-500/20 transition-colors"
+            className="w-full bg-red-50 border border-red-200 text-red-600 py-3.5 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-red-100 transition-colors"
           >
             <LogOut className="w-5 h-5" /> Sign Out
           </button>
           <div className="mt-4 text-center">
             <button 
               onClick={handleDeleteAccount}
-              className="text-slate-600 text-xs hover:text-red-400 transition-colors underline underline-offset-2"
+              className="text-slate-400 text-xs hover:text-red-500 transition-colors underline underline-offset-2"
             >
               Delete my account
             </button>
@@ -277,21 +277,21 @@ export default function ProfilePage() {
 
 function InfoRow({ icon, label, value, isEdit, isDate = false, noBorder = false, onChange }: { icon: React.ReactNode, label: string, value: string, isEdit: boolean, isDate?: boolean, noBorder?: boolean, onChange?: (v: string) => void }) {
   return (
-    <div className={`p-4 flex items-center gap-4 ${!noBorder ? 'border-b border-[#1F2937]' : ''} ${isEdit ? 'bg-[#0F172A]' : ''} transition-colors`}>
-      <div className="w-4 h-4 flex-shrink-0 text-slate-500 mt-1 self-start">
+    <div className={`p-4 flex items-center gap-4 ${!noBorder ? 'border-b border-[#E2E8F0]' : ''} ${isEdit ? 'bg-amber-50/30' : ''} transition-colors`}>
+      <div className="w-4 h-4 flex-shrink-0 text-slate-400 mt-1 self-start">
         {icon}
       </div>
       <div className="flex-1">
-        <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1">{label}</label>
+        <label className="block text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">{label}</label>
         {isEdit ? (
           <input 
             type={isDate ? 'date' : 'text'}
             value={value}
             onChange={(e) => onChange?.(e.target.value)}
-            className="w-full bg-transparent text-white text-sm font-medium outline-none border-b border-amber-500/30 focus:border-amber-500 pb-1 transition-colors [&::-webkit-calendar-picker-indicator]:invert"
+            className="w-full bg-transparent text-[#0F172A] text-sm font-medium outline-none border-b border-amber-300 focus:border-amber-500 pb-1 transition-colors"
           />
         ) : (
-          <div className="text-slate-200 text-sm font-medium">{value}</div>
+          <div className="text-[#0F172A] text-sm font-medium">{value}</div>
         )}
       </div>
     </div>

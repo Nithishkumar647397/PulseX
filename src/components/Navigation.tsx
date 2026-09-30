@@ -24,7 +24,7 @@ export function Navigation() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 border-r border-[#1F2937] bg-[#0A0F1E] p-6">
+      <div className="hidden md:flex flex-col fixed left-0 top-0 h-screen w-64 border-r border-[#E2E8F0] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
         <div className="flex items-center gap-3 mb-10 text-amber-500 font-bold text-2xl tracking-tight">
           <Flame fill="currentColor" size={28} />
           PulseX
@@ -37,8 +37,8 @@ export function Navigation() {
                 <div
                   className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
                     isActive 
-                      ? 'bg-amber-500/10 text-amber-500' 
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-[#111827]'
+                      ? 'bg-amber-50 text-amber-500' 
+                      : 'text-slate-400 hover:text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   <item.icon 
@@ -55,7 +55,7 @@ export function Navigation() {
       </div>
 
       {/* Mobile Bottom Nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0A0F1E]/95 backdrop-blur-xl border-t border-white/5 pb-safe">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-[#E2E8F0] shadow-[0_-1px_10px_rgba(0,0,0,0.06)] pb-safe">
         <nav className="flex justify-around items-center h-16">
           {navItems.map((item) => {
             const isActive = pathname === item.href
@@ -76,10 +76,10 @@ export function Navigation() {
                   )}
                   <item.icon
                     size={22}
-                    className={`relative z-10 transition-colors ${isActive ? 'text-amber-500' : 'text-slate-500'}`}
+                    className={`relative z-10 transition-colors ${isActive ? 'text-amber-500' : 'text-slate-400'}`}
                     fill={isActive && item.name !== 'Add' ? 'currentColor' : 'none'}
                   />
-                  <span className={`text-[10px] font-medium transition-colors ${isActive ? 'text-amber-500' : 'text-slate-500'}`}>
+                  <span className={`text-[10px] font-medium transition-colors ${isActive ? 'text-amber-500' : 'text-slate-400'}`}>
                     {item.name}
                   </span>
                   {isActive && (
