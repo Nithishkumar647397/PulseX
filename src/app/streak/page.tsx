@@ -216,7 +216,7 @@ export default function StreakPage() {
                 cursor={{ fill: '#1F2937', radius: 4 }}
                 contentStyle={{ backgroundColor: '#0A0F1E', border: '1px solid #1F2937', borderRadius: '12px', color: '#fff' }}
                 itemStyle={{ color: '#F59E0B', fontWeight: 'bold' }}
-                formatter={(value: ValueType) => {
+                formatter={(value: ValueType | undefined) => {
                   const num = typeof value === 'number' ? value : 0
                   return [`${num} tasks`, 'Completed']
                 }}
