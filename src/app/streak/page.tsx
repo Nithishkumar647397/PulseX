@@ -1,160 +1,250 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { BarChart, Bar, ResponsiveContainer, XAxis, Tooltip } from 'recharts'
-import { 
-  Home, 
-  CalendarDays, 
-  Zap, 
-  User,
-  TrendingUp,
-  Target,
-  Award,
-  CheckCircle2
-} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+type StreakData = {
+  current_streak: number
+  best_streak: number
+  total_events: number
+  completed_events: number
+  this_week: number
+  today: {
+    total: number
+    completed: number
+    ratio: number
+  }
+  last_30_days: {
+    date: string
+    completed: boolean
+    isToday: boolean
+  }[]
+  weekly_data: {
+    day: string
+    completed: number
+    total: number
+  }[]
+}
+
+const ANIMATION_DURATION = 1
+
+function CountUp({ end, duration = ANIMATION_DURATION }: { end: number, duration?: number }) {
+  const [count, setCount] = useState(0)
+  
+  useEffect(() => {
+    let startTime: number | null = null
+    const animate = (time: number) => {
+      if (!startTime) startTime = time
+      const progress = (time - startTime) / (duration * 1000)
+      if (progress < 1) {
+        setCount(Math.floor(end * progress))
+        requestAnimationFrame(animate)
+      } else {
+        setCount(end)
+      }
+    }
+    requestAnimationFrame(animate)
+  }, [end, duration])
+
+  return <span>{count}</span>
+}
 
 export default function StreakPage() {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] = useState<StreakData | null>(null)
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   useEffect(() => {
-    const fetchStreakData = async () => {
+    const fetchStreak = async () => {
       try {
-        const res = await fetch('/api/streak/full')
-        if (res.status === 401) router.push('/login')
-        const json = await res.json()
-        setData(json)
+        const [resStreak, resFull] = await Promise.all([
+          fetch('/api/streak'),
+          fetch('/api/streak/full')
+        ])
+        if (resStreak.ok && resFull.ok) {
+          const streakJson = await resStreak.json()
+          const fullJson = await resFull.json()
+          setData({
+             current_streak: streakJson.current_streak,
+             today: streakJson.today,
+             total_events: fullJson.stats.total,
+             completed_events: fullJson.stats.completed,
+             this_week: fullJson.stats.thisWeek,
+             best_streak: fullJson.stats.longestStreak,
+             last_30_days: fullJson.calendar.map((c: { date: string, completed: boolean, isToday: boolean }) => ({ date: c.date, completed: c.completed, isToday: c.isToday })),
+             weekly_data: fullJson.weekData.map((w: { day: string, completed: number, total: number }) => ({ day: w.day, completed: w.completed, total: w.total }))
+          })
+        }
       } catch (err) {
         console.error(err)
       } finally {
         setLoading(false)
       }
     }
-    fetchStreakData()
-  }, [router])
+    fetchStreak()
+  }, [])
 
-  if (loading) {
+  if (loading || !data) {
     return (
-      <div className="min-h-screen bg-background p-6 animate-pulse pb-24">
-        <div className="w-32 h-8 bg-surface rounded mb-8"></div>
-        <div className="w-full h-48 bg-surface rounded-2xl mb-6"></div>
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="h-24 bg-surface rounded-2xl"></div>
-          <div className="h-24 bg-surface rounded-2xl"></div>
+      <div className="min-h-screen bg-[#0A0F1E] p-6 animate-pulse">
+        <div className="w-32 h-8 bg-[#1F2937] rounded mb-12"></div>
+        <div className="w-40 h-40 rounded-full bg-[#1F2937] mx-auto mb-12"></div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="h-24 bg-[#1F2937] rounded-2xl"></div>
+          <div className="h-24 bg-[#1F2937] rounded-2xl"></div>
+          <div className="h-24 bg-[#1F2937] rounded-2xl"></div>
+          <div className="h-24 bg-[#1F2937] rounded-2xl"></div>
         </div>
       </div>
     )
   }
 
+  const radius = 70
+  const circumference = 2 * Math.PI * radius
+  const progress = data.today.total > 0 ? data.today.completed / data.today.total : 0
+  const strokeDashoffset = circumference - progress * circumference
+
+  const remaining = data.today.total - data.today.completed
+
+  // Ensure weekly data is structured for recharts
+  const chartData = data.weekly_data.map(d => ({
+    name: d.day,
+    completed: d.completed,
+    isEmpty: d.completed === 0
+  }))
+
   return (
-    <div className="min-h-screen bg-background pb-24 font-sans text-text-primary">
-      <header className="px-6 py-6 border-b border-border">
-        <h1 className="text-3xl font-black text-white">Your Progress</h1>
+    <div className="min-h-screen bg-[#0A0F1E] pb-24">
+      <header className="pt-12 px-5 mb-8">
+        <h1 className="text-[28px] font-bold text-white tracking-tight">Progress</h1>
       </header>
 
-      <main className="p-5 max-w-[480px] mx-auto space-y-6">
-        
-        {/* Weekly Chart */}
-        <div className="card-pulse p-6 text-center">
-          <h2 className="text-lg font-bold text-white flex items-center justify-center gap-2 mb-6">
-            <TrendingUp className="w-5 h-5 text-accent-amber" />
-            Weekly Activity
-          </h2>
-          <div className="h-[200px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data?.weekData || []}>
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#94A3B8', fontSize: 12 }} 
-                  dy={10}
-                />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(245, 158, 11, 0.1)' }}
-                  contentStyle={{ backgroundColor: '#1E293B', border: 'none', borderRadius: '8px', color: '#fff' }}
-                />
-                <Bar 
-                  dataKey="tasks" 
-                  fill="#F59E0B" 
-                  radius={[4, 4, 0, 0]}
-                  barSize={32}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+      {/* TODAY RING HERO */}
+      <div className="flex flex-col items-center mb-10 relative">
+        <div className="relative w-[160px] h-[160px] flex justify-center items-center">
+          <svg className="w-full h-full transform -rotate-90">
+            <circle cx="80" cy="80" r="70" stroke="#1F2937" strokeWidth="12" fill="none" />
+            <motion.circle 
+              cx="80" cy="80" r="70" 
+              stroke="#F59E0B" 
+              strokeWidth="12" 
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset }}
+              transition={{ duration: ANIMATION_DURATION, ease: "easeOut" }}
+            />
+          </svg>
+          <div className="absolute flex flex-col items-center">
+            <span className="text-[40px] font-black text-white leading-none">
+              <CountUp end={Math.round(progress * 100)} />%
+            </span>
+            <span className="text-slate-400 text-[12px] font-medium">today</span>
           </div>
         </div>
+        <p className="text-slate-400 text-sm mt-6 font-medium">
+          {data.today.completed} tasks done · {remaining} remaining
+        </p>
 
-        {/* Stats Grid */}
+        {/* STREAK NUMBER */}
+        <div className="mt-8 flex items-center gap-2">
+          <span className="text-[28px]">🔥</span>
+          <span className="text-[48px] font-black text-white leading-none tracking-tight">
+            <CountUp end={data.current_streak} />
+          </span>
+          <span className="text-slate-400 font-semibold uppercase tracking-wider text-sm mt-2">
+            day streak
+          </span>
+        </div>
+      </div>
+
+      {/* STATS GRID */}
+      <div className="px-5 mb-12">
         <div className="grid grid-cols-2 gap-4">
-          <div className="card-pulse p-5 text-center flex flex-col items-center">
-            <Target className="w-6 h-6 text-blue-400 mb-2" />
-            <h3 className="text-3xl font-black text-white">{data?.stats?.total || 0}</h3>
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-1">Total Events</p>
-          </div>
-          <div className="card-pulse p-5 text-center flex flex-col items-center">
-            <CheckCircle2 className="w-6 h-6 text-success-green mb-2" />
-            <h3 className="text-3xl font-black text-white">{data?.stats?.completed || 0}</h3>
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-1">Completed</p>
-          </div>
-          <div className="card-pulse p-5 text-center flex flex-col items-center">
-            <Award className="w-6 h-6 text-purple mb-2" />
-            <h3 className="text-3xl font-black text-white">{data?.stats?.longestStreak || 0}</h3>
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-1">Longest Streak</p>
-          </div>
-          <div className="card-pulse p-5 text-center flex flex-col items-center">
-            <TrendingUp className="w-6 h-6 text-accent-amber mb-2" />
-            <h3 className="text-3xl font-black text-white">{data?.stats?.thisWeek || 0}</h3>
-            <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mt-1">Done This Week</p>
-          </div>
+          <StatCard label="Total Events" value={data.total_events} />
+          <StatCard label="Completed" value={data.completed_events} />
+          <StatCard label="This Week" value={data.this_week} />
+          <StatCard label="Best Streak" value={data.best_streak} />
         </div>
+      </div>
 
-        {/* 30 Day Calendar */}
-        <div className="card-pulse p-6">
-          <h2 className="text-lg font-bold text-white mb-4">Last 30 Days</h2>
-          <div className="flex flex-wrap gap-2">
-            {data?.calendar?.map((day: any, i: number) => (
-              <div 
-                key={i}
-                className={`w-10 h-10 rounded-xl flex flex-col items-center justify-center text-xs font-bold transition-all
-                  ${day.isToday ? 'ring-2 ring-accent-amber ring-offset-2 ring-offset-background' : ''}
-                  ${day.completed ? 'bg-success-green text-background' : 'bg-surface border border-border text-text-muted'}
-                `}
-                title={`${day.date}: ${day.tasksDone} tasks done`}
-              >
-                {new Date(day.date).getDate()}
-              </div>
+      {/* 30-DAY CALENDAR */}
+      <div className="px-5 mb-12">
+        <h2 className="text-white font-bold text-lg mb-4">Last 30 Days</h2>
+        <div className="bg-[#111827] rounded-3xl p-5 border border-[#1F2937]">
+          <div className="grid grid-cols-7 gap-y-3 gap-x-2 text-center mb-3">
+            {['M','T','W','T','F','S','S'].map((d, i) => (
+              <span key={i} className="text-slate-600 text-[10px] font-bold">{d}</span>
             ))}
           </div>
+          <div className="grid grid-cols-7 gap-y-3 gap-x-2 justify-items-center">
+            {data.last_30_days.map((day, i) => {
+              // Adjust layout slightly for nice spacing
+              return (
+                <motion.div
+                  key={day.date}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: i * 0.015 }}
+                  className={`w-[36px] h-[36px] rounded-lg flex items-center justify-center
+                    ${day.completed ? 'bg-green-500' : 'bg-[#1F2937]'}
+                    ${day.isToday ? 'ring-2 ring-amber-500 ring-offset-2 ring-offset-[#111827]' : ''}
+                  `}
+                />
+              )
+            })}
+          </div>
         </div>
+      </div>
 
-      </main>
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-md border-t border-border px-6 py-3 pb-safe z-30">
-        <div className="max-w-[480px] mx-auto flex justify-between items-center">
-          <Link href="/dashboard" className="flex flex-col items-center gap-1 text-text-muted hover:text-white transition-colors">
-            <Home className="w-6 h-6" />
-            <span className="text-[10px] font-medium">Home</span>
-          </Link>
-          <Link href="/upload" className="flex flex-col items-center gap-1 text-text-muted hover:text-white transition-colors">
-            <CalendarDays className="w-6 h-6" />
-            <span className="text-[10px] font-medium">Add</span>
-          </Link>
-          <Link href="/streak" className="flex flex-col items-center gap-1 text-accent-amber relative">
-            <Zap className="w-6 h-6" />
-            <span className="text-[10px] font-bold">Streak</span>
-            <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-accent-amber"></div>
-          </Link>
-          <Link href="/profile" className="flex flex-col items-center gap-1 text-text-muted hover:text-white transition-colors">
-            <User className="w-6 h-6" />
-            <span className="text-[10px] font-medium">Profile</span>
-          </Link>
+      {/* WEEKLY CHART */}
+      <div className="px-5 mb-8">
+        <h2 className="text-white font-bold text-lg mb-4">This Week</h2>
+        <div className="bg-[#111827] rounded-3xl p-5 border border-[#1F2937] h-[220px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#64748b', fontSize: 12, fontWeight: 500 }} 
+                dy={10}
+              />
+              <Tooltip 
+                cursor={{ fill: '#1F2937', radius: 4 }}
+                contentStyle={{ backgroundColor: '#0A0F1E', border: '1px solid #1F2937', borderRadius: '12px', color: '#fff' }}
+                itemStyle={{ color: '#F59E0B', fontWeight: 'bold' }}
+                formatter={(value: number) => [`${value} tasks`, 'Completed']}
+                labelStyle={{ display: 'none' }}
+              />
+              <Bar 
+                dataKey="completed" 
+                radius={[4, 4, 4, 4]} 
+                fill="#F59E0B"
+                // Recharts doesn't natively support dynamic fills per bar easily without custom shape, 
+                // but we can pass a function to shape or use standard fill since the requirement says "amber for completed, empty for empty".
+                // We'll map the data to show small bars for 0 so it's visible.
+                minPointSize={4}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-      </nav>
+      </div>
+
+    </div>
+  )
+}
+
+function StatCard({ label, value }: { label: string, value: number }) {
+  return (
+    <div className="bg-[#111827] rounded-2xl p-5 text-center border border-[#1F2937]">
+      <div className="text-[28px] font-black text-amber-500 leading-tight">
+        <CountUp end={value} />
+      </div>
+      <div className="text-slate-400 text-[12px] uppercase tracking-wider font-semibold mt-1">
+        {label}
+      </div>
     </div>
   )
 }

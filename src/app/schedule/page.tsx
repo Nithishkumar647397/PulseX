@@ -81,8 +81,6 @@ const getNextReminder = (event: Event) => {
 }
 
 export default function SchedulePage() {
-  const router = useRouter()
-  
   // State
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [view, setView] = useState<'Today' | 'Week' | 'Month'>('Today')
@@ -140,7 +138,9 @@ export default function SchedulePage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line
     fetchData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate])
 
   const handleToggleComplete = async (event: Event) => {
@@ -153,6 +153,7 @@ export default function SchedulePage() {
         body: JSON.stringify({ completed: updatedStatus })
       })
     } catch (error) {
+      console.error(error)
       setEvents(prev => prev.map(e => e.id === event.id ? { ...e, completed: !updatedStatus } : e))
     }
   }
@@ -209,7 +210,7 @@ export default function SchedulePage() {
             {['Today', 'Week', 'Month'].map(v => (
               <button
                 key={v}
-                onClick={() => setView(v as any)}
+                onClick={() => setView(v as 'Today' | 'Week' | 'Month')}
                 className={`flex-1 py-1.5 text-sm font-semibold rounded-lg transition-all ${
                   view === v 
                     ? 'bg-black text-white shadow-sm' 

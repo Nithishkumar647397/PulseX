@@ -37,7 +37,7 @@ export function generateReminderEmailHtml(
   `
 }
 
-export function generateConflictEmailHtml(date: string, events: any[]) {
+export function generateConflictEmailHtml(date: string, events: { title: string; category: string }[]) {
   return `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #111827;">
       <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 24px;">

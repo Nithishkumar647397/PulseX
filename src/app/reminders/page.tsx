@@ -10,8 +10,7 @@ import {
   User, 
   CheckCircle2, 
   Clock,
-  Check,
-  Circle
+  Check
 } from 'lucide-react'
 
 // --- Types ---
@@ -20,7 +19,7 @@ type SentLog = {
   event_id: string
   reminder_stage: string
   sent_at: string
-  event?: any
+  event?: { title: string, priority: number }
 }
 
 type Event = {
@@ -115,6 +114,7 @@ export default function RemindersPage() {
     for (const stage of eventStages) {
       if (!sentStages.includes(stage)) {
         const stageDate = getStageDate(event.event_date, stage)
+        // eslint-disable-next-line react-hooks/purity
         const diff = stageDate.getTime() - Date.now()
         // If it's in the future (or even slightly past but not sent yet), consider it next
         // Since the backend handles actual sending, anything not in sent_log is pending.
@@ -156,7 +156,7 @@ export default function RemindersPage() {
           <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center text-gray-500 shadow-sm mt-8">
             <Bell className="w-10 h-10 mx-auto mb-3 text-gray-300" />
             <h3 className="font-bold text-gray-900 mb-1">No reminders yet</h3>
-            <p className="text-sm">They'll start showing up as your events approach.</p>
+            <p className="text-sm">They&apos;ll start showing up as your events approach.</p>
           </div>
         ) : (
           <>
@@ -186,7 +186,7 @@ export default function RemindersPage() {
                       {/* Vertical line */}
                       <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-gray-200"></div>
                       
-                      {nextEventInfo.allStages.map((stage: string, idx: number) => {
+                      {nextEventInfo.allStages.map((stage: string) => {
                         const isSent = nextEventInfo?.sentStages.includes(stage)
                         const isNext = stage === nextEventInfo?.stage
                         
@@ -225,7 +225,7 @@ export default function RemindersPage() {
               <section className="mb-10">
                 <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center shadow-sm">
                   <CheckCircle2 className="w-10 h-10 mx-auto mb-3 text-gray-300" />
-                  <h3 className="font-bold text-gray-900 mb-1">You're all caught up!</h3>
+                  <h3 className="font-bold text-gray-900 mb-1">You&apos;re all caught up!</h3>
                   <p className="text-sm text-gray-500">No upcoming reminders pending.</p>
                 </div>
               </section>
